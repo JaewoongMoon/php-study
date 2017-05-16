@@ -1,0 +1,68 @@
+* Reference
+
+https://docs.zendframework.com/tutorials/getting-started/skeleton-application/
+
+* System Requirement
+** PHP Version over 5.6
+php --version
+
+** Apache server
+install : sudo apt install apache2
+version check :httpd -v
+config file :/etc/apache2/apache2.conf
+restart :sudo service apache2 restart
+
+** Apache mode_rewirte module
+check : apache2ctl -M
+install : sudo a2enmod rewrite
+$sudo service apache2 restart
+
+** MySQL
+install : sudo apt-get install mysql-server
+          sudo mysql_secure_installation
+testing : systemctl status mysql.service
+          mysqladmin -p -u root version
+login : mysql -u root -p
+show databases: show databases;
+
+** Enable apache support for .htaccess 
+httpd.conf : AllowOverride None -> AllowOverride FileInfo
+
+** composer : PHP module management program
+install : sudo apt-get install curl php-cli php-mbstring git unzip composer
+$composer self-update
+$composer install
+
+** vagrant : simple virtual machine management
+$sudo apt install vagrant
+
+
+* Getting started : A skeleton application
+$composer create-project -s dev zendframework/skeleton-application /var/www/zend-training
+
+
+** using the Built-in PHP web Server (Develop Only!)
+$cd /var/www/zend-training
+$php -S 0.0.0.0:8080 -t public public/index.php
+
+
+* Modules
+zend-mvc uses a module system to orgranize your main application-specific code.
+The Application module provided by the skeleton is used to provide bootstrapping, error,
+and routing configuration to the whole application. 
+
+** Setting up the Album module
+1) create directory skeleton. 
+2) Create Module.php file.
+
+** Autoloading
+add Album context to the "composer.json" file which is located in project root. 
+
+** Configuration
+
+
+
+
+
+
+  
