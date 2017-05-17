@@ -1,50 +1,110 @@
-* Reference
+* 서문
+Zend 프레임웍을 설치/사용해보고 결과를 정리한다. 
 
-https://docs.zendframework.com/tutorials/getting-started/skeleton-application/
+* Reference
+https://docs.zendframework.com/tutorials/getting-started/overview/
+
+* Zend 설치
+#+BEGIN_SRC shell-script
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install zend-framework
+#+END_SRC
+설치된 버전은 1.11.11 이다.
 
 * System Requirement
+Ubuntu 16.04 에서 설치 및 구동하였다.
+Zend를 사용하기 위한 시스템 요구사항은 다음과 같다.
 ** PHP Version over 5.6
+#+BEGIN_SRC shell-script
 php --version
+#+END_SRC
 
-** Apache server
-install : sudo apt install apache2
-version check :httpd -v
-config file :/etc/apache2/apache2.conf
-restart :sudo service apache2 restart
+** Web Server
 
-** Apache mode_rewirte module
-check : apache2ctl -M
-install : sudo a2enmod rewrite
-$sudo service apache2 restart
-
-** MySQL
-install : sudo apt-get install mysql-server
-          sudo mysql_secure_installation
-testing : systemctl status mysql.service
-          mysqladmin -p -u root version
-login : mysql -u root -p
-show databases: show databases;
-
-** Enable apache support for .htaccess 
+*** Apache server
+**** basic command
+***** install 
+#+BEGIN_SRC shell-script
+sudo apt install apache2
+#+END_SRC
+***** version check 
+#+BEGIN_SRC shell-script
+httpd -v
+#+END_SRC
+***** config file 
+#+BEGIN_SRC shell-script
+/etc/apache2/apache2.conf
+#+END_SRC
+***** restart 
+#+BEGIN_SRC shell-script
+sudo service apache2 restart
+#+END_SRC
+**** Apache mode rewirte module
+***** check
+#+BEGIN_SRC shell-script
+apache2ctl -M
+#+END_SRC
+***** install 
+#+BEGIN_SRC shell-script
+sudo a2enmod rewrite
+#+END_SRC
+**** Enable apache support for .htaccess 
 httpd.conf : AllowOverride None -> AllowOverride FileInfo
 
-** composer : PHP module management program
-install : sudo apt-get install curl php-cli php-mbstring git unzip composer
-$composer self-update
-$composer install
-
-** vagrant : simple virtual machine management
-$sudo apt install vagrant
-
-
-* Getting started : A skeleton application
-$composer create-project -s dev zendframework/skeleton-application /var/www/zend-training
-
-
-** using the Built-in PHP web Server (Develop Only!)
+*** php 기본 웹 서버 
+**** using the Built-in PHP web Server (Develop Only!)
+#+BEGIN_SRC shell-script
 $cd /var/www/zend-training
 $php -S 0.0.0.0:8080 -t public public/index.php
+#+END_SRC
 
+** DBMS
+쓰고싶은 것을 고르면된다. 튜토리얼에는 sqlite3로 되어있다.
+*** MySQL
+**** install
+#+BEGIN_SRC shell-script
+sudo apt-get install mysql-server
+sudo apt-get install php-mysql
+sudo mysql_secure_installation
+#+END_SRC 		  
+**** testing
+#+BEGIN_SRC shell-script
+systemctl status mysql.service
+mysqladmin -p -u root version
+#+END_SRC
+**** login
+#+BEGIN_SRC shell-script
+mysql -u root -p
+show databases;
+#+END_SRC
+
+*** Sqlite3
+**** install
+#+BEGIN_SRC shell-script
+sudo apt-get install php7.0-sqlite3
+sudo apt-get install php-sqlite3
+#+END_SRC
+**** login
+#+BEGIN_SRC shell-script
+sqlite3 [db파일명]
+.database      
+#+END_SRC
+
+
+** composer : PHP module management program
+#+BEGIN_SRC shell-script
+$sudo apt-get install curl php-cli php-mbstring git unzip composer
+$composer self-update
+$composer install
+#+END_SRC
+
+* Getting started : A skeleton application
+#+BEGIN_SRC shell-script
+$composer create-project -s dev zendframework/skeleton-application /var/www/zend-training
+#+END_SRC
+프로젝트를 만들 때 최소 필요사항으로 만들 것인지 물어보는데, 이 때 N으로 대답하지 않으면 필요한 
+모듈들(db, form검증 관련)이 설치되지 않으므로 주의한다. 
 
 * Modules
 zend-mvc uses a module system to orgranize your main application-specific code.
@@ -53,16 +113,111 @@ and routing configuration to the whole application.
 
 ** Setting up the Album module
 1) create directory skeleton. 
+수동으로 directory 구조를 만든다. 
+
 2) Create Module.php file.
 
+
 ** Autoloading
+composer.json 파일에 album 컨텍스트를 추가한다. 
 add Album context to the "composer.json" file which is located in project root. 
 
 ** Configuration
+module.config.php 파일에 album 컨트롤러와 view 파일 경로를 설정해준다.
+JAVA의 spring-servlet 과 비슷한 기능을 한다. 
+
+** Informing the application about our new module
+We need to tell the *ModuleManager* that this new module exists. 
+This is done in the application's *config/modules.config.php* file which is provided by the
+skeleton application. 
+
+modules.config.php 파일에 새로 작성한 album모듈이 로딩되도록 추가해준다. 
 
 
+* Routing and Controllers
 
+| Page          | Controller      | Action |
+|---------------+-----------------+--------|
+| Home          | AlbumController | index  |
+| Add new album | AlbumController | add    |
+| Edit album    | AlbumController | edit   |
+| Delete album  | AlbumController | delete |
+|---------------+-----------------+--------|
 
+The mapping of a URL to a particular action is done using routes that are defined in the 
+module's *module.config.php* file. We will add a route for our album actions. 
 
+/album URL로 들어왔을 때 동작할 컨트롤러 메서드들의 매핑정보를 설정해준다. 
 
+** Create the controller
+컨트롤러 파일을 작성
+
+** Initialize the view scripts
+view 파일을 작성
   
+* Datebase and models
+** The database
+#+BEGIN_SRC shell-script
+$ sqlite3 data/zftutorial.db < data/schema.sql
+#+END_SRC
+
+** The model files
+PHP에서는 도메인 객체와 서비스 객체를 합쳐서 모델이라고 부르나 보다. 
+도메인 클래스(Album.php)와 서비스 클래스(AlbumTable.php)를 작성한다. 
+
+We are going to create a model by creating an *AlbumTable* class that
+comsumes a *Zend\Db\TableGateway\TableGateway*, and in which each album
+will be represented as an *Album* object (known as an /entity/).
+This is an implementation of the *Table Date Gateway* design pattern 
+to allow for interfacing with data in a database table. 
+
+** Using ServiceManager to configure the table gateway and inject into the AlbumTable
+In order to always use the same instance of our *AlbumTable*, 
+we will use the *ServiceManager* to define how to create one. 
+
+Zend Framework's *ModuleManager* merges all the configuration from deach module's
+*module.config.php* file. 
+
+** Listing albums
+
+
+
+* File Tree
+작성했던 파일들의 경로와 역할을 정리해둔다.
+#+options: num:nil
+** /module
+프로그래머가 작성한 모듈들이 위치함. 
+*** /Album
+**** /config
+***** module.config.php
+spring-servlet과 비슷.
+URL경로 매핑, view 파일 위치 지정 등
+**** /src
+***** /Controller
+****** AlbumController.php
+컨트롤러
+**** /Form
+**** /Model
+****** Album.php
+모델 객체
+****** AlbumTable.php
+서비스 객체. 내부에 dao 와 비슷한 tableGateway 개체를 가지고 있음. 
+tableGateway객체는 프레임워크에서 생성해서 주입해줌. 
+**** /view
+***** /album
+****** /album
+CRUD view 파일들
+index.ptml
+add.phtml
+edit.phtml
+delete.phtml
+** /config
+*** /autoload
+**** global.php
+전역 환경변수 파일. DB 접속정보 등.
+*** modules.config.php
+로드할 모듈들에 대한 정보
+** /data
+sql 파일(DDL, DML), db 파일
+** /vendor
+zend에서 제공하는 프레임웍 모듈들

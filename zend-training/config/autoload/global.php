@@ -13,4 +13,10 @@
 
 return [
     // ...
+	// dsn : Data Source Name
+	'db' => [
+		'driver' => 'Pdo',
+		'dsn' => sprintf('sqlite:%s/data/zftutorial.db',realpath(getcwd())),
+//		'dsn' => 'sqlite:/var/www/zend-training/data/zftutorial.db',
+		],
 ];
